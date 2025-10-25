@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../api_services/api_services.dart';
-import '../api_services/models/place_from_coordinates.dart';
+import '../api_services/models/place_from_coordinates.dart'; 
 
 class LiveMap extends StatefulWidget {
   final double latitude;
   final double longitude;
 
-  const LiveMap({super.key, required this.latitude, required this.longitude});
+  const LiveMap({
+    super.key,
+    required this.latitude,
+    required this.longitude,
+  });
 
   @override
   State<LiveMap> createState() => _LiveMapState();
@@ -28,7 +32,9 @@ class _LiveMapState extends State<LiveMap> {
 
   Future<void> _fetchAddress(double lat, double lng) async {
     try {
-      final data = await ApiService().placeFromCoordinates(lat, lng);
+      // ✅ Explicitly use the type here
+      PlaceFromCoordinates data = await ApiService().placeFromCoordinates(lat, lng);
+      
       setState(() {
         address = data.results.isNotEmpty
             ? data.results[0].formattedAddress
@@ -69,7 +75,11 @@ class _LiveMapState extends State<LiveMap> {
                 },
               ),
               const Center(
-                child: Icon(Icons.location_pin, size: 50, color: Colors.red),
+                child: Icon(
+                  Icons.location_pin,
+                  size: 50,
+                  color: Colors.red,
+                ),
               ),
             ],
           ),
@@ -86,7 +96,9 @@ class _LiveMapState extends State<LiveMap> {
                 child: Text(
                   address,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

@@ -12,7 +12,6 @@ class StudentMainPage extends StatelessWidget {
     return Scaffold(
       appBar: const TitleBar(title: 'KIIT BUS'),
 
-     
       body: Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Align(
@@ -22,13 +21,12 @@ class StudentMainPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: const Color.fromARGB(255, 246, 239, 239),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
         ),
       ),
 
-      
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         decoration: BoxDecoration(
@@ -86,10 +84,10 @@ class StudentMainPage extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (_) => const BusSchedulePage()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BusSchedulePage()),
+                  );
                 },
               ),
             ),

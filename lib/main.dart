@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'theme.dart';
-
-
 import 'screens/splash/splash_screen.dart';
-// import 'screens/auth/login_screen.dart';
-// import 'screens/student/student_dashboard.dart';
-// import 'screens/student/bus_schedule.dart';
-// import 'screens/driver/driver_dashboard.dart';
 
-void main() => runApp(const KiitBusApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const KiitBusApp());
+}
 
 class KiitBusApp extends StatelessWidget {
   const KiitBusApp({super.key});

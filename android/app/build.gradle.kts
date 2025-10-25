@@ -1,45 +1,43 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id 'dev.flutter.flutter-gradle-plugin'
-    id 'com.google.gms.google-services'
+    id("com.android.application")
+    id("kotlin-android")
+    id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace 'com.example.kiit_bus'
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    namespace = "com.example.kiit_bus"
+    compileSdk = 34
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "11"
     }
 
     defaultConfig {
-        applicationId "com.example.kiit_bus"
+        applicationId = "com.example.kiit_bus"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutter.versionCode
-        versionName flutter.versionName
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
 
 flutter {
-    source '../..'
+    source = "../.."
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:34.4.0')
-    implementation 'com.google.firebase:firebase-analytics'
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }
