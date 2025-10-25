@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
             TextField(
               decoration: const InputDecoration(
                 labelText: 'Username',
-                labelStyle: TextStyle(color: Colors.white10),
+                labelStyle: TextStyle(color: Color.fromARGB(234, 248, 246, 246)),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -26,7 +26,7 @@ class LoginScreen extends StatelessWidget {
               obscureText: true,
               decoration: const InputDecoration(
                 labelText: 'Password',
-                 labelStyle: TextStyle(color: Colors.white10),
+                 labelStyle: TextStyle(color: Color.fromARGB(244, 255, 255, 255)),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -45,10 +45,10 @@ class LoginScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
            
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(builder: (_) => const DriverMainPage()),
-                // );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DriverMainPage()),
+                );
               },
               child: const Text('Login as Driver'),
             ),

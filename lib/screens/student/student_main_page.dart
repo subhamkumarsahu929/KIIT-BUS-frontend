@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'student_dashboard.dart';
 import 'bus_schedule.dart';
+import '../../widgets/title_bar.dart';
 
 class StudentMainPage extends StatelessWidget {
   const StudentMainPage({super.key});
@@ -8,58 +10,25 @@ class StudentMainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('KIIT BUS'),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor, // ✅ keep green
+      appBar: const TitleBar(title: 'KIIT BUS'),
 
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.info_outline,
-              color: Colors.black, // ✅ only icon is black
+     
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Text(
+            'Welcome to Student Portal',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromARGB(255, 246, 239, 239),
             ),
-            tooltip: 'About',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  title: Row(
-                    children: const [
-                      Icon(Icons.directions_bus, color: Colors.green, size: 30),
-                      SizedBox(width: 10),
-                      Text('About KIIT BUS'),
-                    ],
-                  ),
-                  content: const Text(
-                    'KIIT BUS helps students track live bus locations and view schedules.\n\n'
-                    'Developed as a demonstration app for the KIIT Transport System.',
-                    style: TextStyle(fontSize: 15, height: 1.4),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('OK',
-                          style: TextStyle(color: Colors.green)),
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
-        ],
-      ),
-
-      body: const Center(
-        child: Text(
-          'Welcome to Student Portal',
-          style: TextStyle(fontSize: 18),
         ),
       ),
 
+      
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         decoration: BoxDecoration(
@@ -94,10 +63,10 @@ class StudentMainPage extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (_) => const StudentDashboard()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const StudentDashboard()),
+                  );
                 },
               ),
             ),

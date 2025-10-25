@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057744821407",
+    "project_id": "kiit-bus",
+    "storage_bucket": "kiit-bus.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057744821407:android:9a1ed063c1302e479116aa",
+        "android_client_info": {
+          "package_name": "com.example.kiit_bus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD00z5U-zkG75wma6E8MqB_InDrHW1fSZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
