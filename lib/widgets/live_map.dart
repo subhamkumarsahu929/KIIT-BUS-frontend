@@ -1,111 +1,130 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../api_services/api_services.dart';
-import '../api_services/models/place_from_coordinates.dart'; 
+import '../api_services/models/place_from_coordinates.dart';
 
 class LiveMap extends StatefulWidget {
-  final double latitude;
-  final double longitude;
+  final String busNumber; 
 
-  const LiveMap({
-    super.key,
-    required this.latitude,
-    required this.longitude,
-  });
+  const LiveMap({super.key, required this.busNumber});
 
   @override
   State<LiveMap> createState() => _LiveMapState();
 }
 
 class _LiveMapState extends State<LiveMap> {
-  late double lat;
-  late double lng;
-  String address = "Loading...";
+  GoogleMapController? _mapController;
+  LatLng? _busLocation;
+  DatabaseReference? _busRef;
+  String _address = "Fetching address...";
 
   @override
   void initState() {
     super.initState();
-    lat = widget.latitude;
-    lng = widget.longitude;
-    _fetchAddress(lat, lng);
+
+   
+    _busRef = FirebaseDatabase.instance.ref("buses/${widget.busNumber}");
+
+    
+    _busRef!.onValue.listen((event) async {
+      final data = event.snapshot.value as Map?;
+      if (data != null && data['latitude'] != null && data['longitude'] != null) {
+        final double lat = (data['latitude'] as num).toDouble();
+        final double lng = (data['longitude'] as num).toDouble();
+
+        setState(() {
+          _busLocation = LatLng(lat, lng);
+        });
+
+        
+        if (_mapController != null) {
+          _mapController!.animateCamera(CameraUpdate.newLatLng(_busLocation!));
+        }
+
+        await _updateAddress(lat, lng);
+      }
+    });
   }
 
-  Future<void> _fetchAddress(double lat, double lng) async {
+  Future<void> _updateAddress(double lat, double lng) async {
     try {
-      // ✅ Explicitly use the type here
       PlaceFromCoordinates data = await ApiService().placeFromCoordinates(lat, lng);
-      
-      setState(() {
-        address = data.results.isNotEmpty
-            ? data.results[0].formattedAddress
-            : "No address found";
-      });
+      if (data.results.isNotEmpty) {
+        setState(() {
+          _address = data.results[0].formattedAddress;
+        });
+      } else {
+        setState(() {
+          _address = "Address not found";
+        });
+      }
     } catch (e) {
       setState(() {
-        address = "Failed to fetch address";
+        _address = "Failed to fetch address";
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Stack(
-            children: [
-              GoogleMap(
-                mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(lat, lng),
-                  zoom: 16,
-                ),
-                onCameraMove: (position) {
-                  setState(() {
-                    lat = position.target.latitude;
-                    lng = position.target.longitude;
-                  });
-                },
-                onCameraIdle: () => _fetchAddress(lat, lng),
-                markers: {
-                  Marker(
-                    markerId: const MarkerId("live_location"),
-                    position: LatLng(lat, lng),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Bus ${widget.busNumber} Live Tracking"),
+        backgroundColor: Colors.green.shade700,
+      ),
+      body: _busLocation == null
+          ? const Center(
+              child: Text(
+                "Waiting for bus location...",
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                      target: _busLocation!,
+                      zoom: 16,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId("bus_marker"),
+                        position: _busLocation!,
+                        infoWindow: InfoWindow(title: "Bus ${widget.busNumber}"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueAzure,
+                        ),
+                      ),
+                    },
+                    onMapCreated: (controller) => _mapController = controller,
                   ),
-                },
-              ),
-              const Center(
-                child: Icon(
-                  Icons.location_pin,
-                  size: 50,
-                  color: Colors.red,
                 ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          color: Colors.white,
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              const Icon(Icons.location_on, color: Colors.red),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  address,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  width: double.infinity,
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.red),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _address,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-        ),
-      ],
+              ],
+            ),
     );
   }
 }

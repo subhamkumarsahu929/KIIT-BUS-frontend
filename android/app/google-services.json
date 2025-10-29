@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1057744821407",
+    "firebase_url": "https://kiit-bus-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "kiit-bus",
     "storage_bucket": "kiit-bus.firebasestorage.app"
   },
