@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../widgets/title_bar.dart';
-import '../../theme.dart'; // ✅ use your theme
+import '../../theme.dart';
 
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
@@ -56,8 +56,9 @@ class _DriverDashboardState extends State<DriverDashboard> {
       if (_disposed ||
           !mounted ||
           newLoc.latitude == null ||
-          newLoc.longitude == null)
+          newLoc.longitude == null) {
         return;
+      }
 
       setState(() => currentLocation = newLoc);
 
@@ -100,7 +101,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             Text(
               'Driver Control Panel',
               style: theme.textTheme.titleLarge?.copyWith(
@@ -110,7 +110,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
             const SizedBox(height: 20),
 
-            // Bus Number Input
             Form(
               key: _formKey,
               child: TextFormField(
@@ -132,7 +131,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
             const SizedBox(height: 25),
 
-            // Start/Stop Button
             Center(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -177,7 +175,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
             const SizedBox(height: 30),
 
-            // Google Map Section
             Expanded(
               child: currentLocation == null
                   ? const Center(child: CircularProgressIndicator())
@@ -193,10 +190,8 @@ class _DriverDashboardState extends State<DriverDashboard> {
                           ),
                           zoom: 16,
                         ),
-                        markers: Set<Marker>.from([
-                          if (currentLocation?.latitude != null &&
-                              currentLocation?.longitude != null &&
-                              mounted)
+                        markers: {
+                          if (currentLocation != null)
                             Marker(
                               markerId: const MarkerId('driver'),
                               position: LatLng(
@@ -206,31 +201,14 @@ class _DriverDashboardState extends State<DriverDashboard> {
                               infoWindow: InfoWindow(
                                 title: 'Current Location',
                                 snippet:
-                                    'Lat: ${currentLocation!.latitude?.toStringAsFixed(4)}, Lng: ${currentLocation!.longitude?.toStringAsFixed(4)}',
-                                onTap: mounted
-                                    ? () {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Updated at: ${DateTime.now().toLocal()}',
-                                              ),
-                                              duration: const Duration(
-                                                seconds: 2,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    : null,
+                                    'Lat: ${currentLocation!.latitude?.toStringAsFixed(4)}, '
+                                    'Lng: ${currentLocation!.longitude?.toStringAsFixed(4)}',
                               ),
                               icon: BitmapDescriptor.defaultMarkerWithHue(
                                 BitmapDescriptor.hueGreen,
                               ),
                             ),
-                        ]),
+                        },
                       ),
                     ),
             ),

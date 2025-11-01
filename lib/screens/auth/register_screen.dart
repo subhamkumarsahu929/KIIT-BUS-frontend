@@ -20,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
 
-  String _userType = 'student'; // Default
+  String _userType = 'student';
   bool _isLoading = false;
 
   Future<void> _register() async {
@@ -29,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final username = _usernameController.text.trim();
 
     if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all fields')),
       );
@@ -38,28 +39,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ Create account in Firebase Auth
-      UserCredential userCred = await _auth.createUserWithEmailAndPassword(
+      final userCred = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      String uid = userCred.user!.uid;
+      final uid = userCred.user!.uid;
 
-      // 2️⃣ Save user data to Realtime Database
       await _dbRef.child("users").child(uid).set({
         "username": username,
         "email": email,
         "role": _userType,
       });
 
-      // 3️⃣ Save local preference
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userType', _userType);
+      await prefs.setString('username', username);
+      await prefs.setString('email', email);
 
       if (!mounted) return;
 
-      // 4️⃣ Redirect based on user type
       if (_userType == 'student') {
         Navigator.pushReplacement(
           context,
@@ -71,11 +70,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           MaterialPageRoute(builder: (_) => const DriverMainPage()),
         );
       }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account created successfully!')),
+      );
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Registration failed')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -115,7 +120,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Username field 🧍‍♂️
                 TextField(
                   controller: _usernameController,
                   decoration: InputDecoration(
@@ -128,7 +132,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Email field 📧
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -142,7 +145,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Password field 🔒
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -156,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // User type selection (student/driver)
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -164,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       value: 'student',
                       groupValue: _userType,
                       onChanged: (value) =>
-                          setState(() => _userType = value!),
+                          setState(() => _userType = value ?? 'student'),
                     ),
                     const Text('Student'),
                     const SizedBox(width: 20),
@@ -172,14 +174,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       value: 'driver',
                       groupValue: _userType,
                       onChanged: (value) =>
-                          setState(() => _userType = value!),
+                          setState(() => _userType = value ?? 'driver'),
                     ),
                     const Text('Driver'),
                   ],
                 ),
                 const SizedBox(height: 30),
 
-                // Register button 🚀
                 _isLoading
                     ? const CircularProgressIndicator()
                     : SizedBox(
@@ -191,10 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: _register,
                         ),
                       ),
-
                 const SizedBox(height: 20),
-
-                // Go to login link
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Already have an account? Login'),

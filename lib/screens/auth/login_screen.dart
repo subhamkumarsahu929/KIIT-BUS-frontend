@@ -18,73 +18,82 @@ class _LoginScreenState extends State<LoginScreen> {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _isLoading = false;
 
-  Future<void> _login(String userType) async {
+  Future<void> _login(String selectedRole) async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter all fields')));
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ Firebase sign-in
       UserCredential userCred = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
       String uid = userCred.user!.uid;
 
-      // 2️⃣ Fetch user data from Realtime Database
-      DataSnapshot snapshot = await _dbRef.child("users").child(uid).get();
+      final snapshot = await _dbRef.child("users").child(uid).get();
 
       if (!snapshot.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User data not found in database')),
-        );
+        final isMounted = context.mounted;
+        if (isMounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User not found in database')),
+          );
+        }
         return;
       }
 
       final userData = Map<String, dynamic>.from(snapshot.value as Map);
 
-      // 3️⃣ Save user info locally for auto-login
+      final String role = userData['role'] ?? selectedRole;
+      final String username = userData['username'] ?? 'Unknown';
+      final String userEmail = userData['email'] ?? email;
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userType', userData['role'] ?? userType);
-      await prefs.setString('username', userData['username'] ?? 'Unknown');
-      await prefs.setString('email', userData['email'] ?? email);
+      await prefs.setString('userType', role);
+      await prefs.setString('username', username);
+      await prefs.setString('email', userEmail);
 
       if (!mounted) return;
 
-      // 4️⃣ Navigate to correct dashboard based on role
-      if (userData['role'] == 'student') {
+      if (role == 'student') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const StudentMainPage()),
         );
-      } else if (userData['role'] == 'driver') {
+      } else if (role == 'driver') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const DriverMainPage()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unknown user type')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid user role')));
       }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login successful!')));
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Login failed')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Login failed')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -104,12 +113,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.directions_bus_filled,
-                  size: size.height * 0.12,
-                  color: Theme.of(context).primaryColor,
+                Image.asset(
+                  'assets/icons/logo.png',
+                  height: size.height * 0.25,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 25),
+
                 Text(
                   'Welcome to KIIT BUS',
                   style: TextStyle(
@@ -120,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Email field
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -134,7 +143,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Password field
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -148,53 +156,58 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 35),
 
-                if (_isLoading)
-                  const CircularProgressIndicator()
-                else ...[
-                  // Student Login Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.school, color: Colors.white),
-                      label: const Text('Login as Student'),
-                      onPressed: () => _login('student'),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.school,
+                                color: Colors.white,
+                              ),
+                              label: const Text('Login as Student'),
+                              onPressed: () => _login('student'),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
 
-                  // Driver Login Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.directions_bus,
+                                color: Colors.white,
+                              ),
+                              label: const Text('Login as Driver'),
+                              onPressed: () => _login('driver'),
+                            ),
+                          ),
+                        ],
                       ),
-                      icon: const Icon(
-                        Icons.directions_bus,
-                        color: Colors.white,
-                      ),
-                      label: const Text('Login as Driver'),
-                      onPressed: () => _login('driver'),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text('Don’t have an account? Register here'),
-                  ),
-                ],
+
+                const SizedBox(height: 20),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
+                  child: const Text('Don’t have an account? Register here'),
+                ),
               ],
             ),
           ),

@@ -23,8 +23,8 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
 
     final prefs = await SharedPreferences.getInstance();
-    final userType = prefs.getString('userType'); // "student" or "driver"
-     
+    final userType = prefs.getString('userType'); 
+
     if (!mounted) return;
 
     if (userType == 'student') {
@@ -55,7 +55,11 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.directions_bus, size: 100, color: Colors.white),
+            Image.asset(
+              'assets/icons/logo.png', 
+              height: 160,
+              width: 160,
+            ),
             const SizedBox(height: 20),
             const Text(
               'KIIT BUS',
@@ -66,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             const CircularProgressIndicator(color: Colors.white),
           ],
         ),
