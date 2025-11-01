@@ -74,7 +74,7 @@ flutter:
   assets:
   - assets/icons/bus.png
   - assets/icons/gmail.png
-  - assets/icons/instagram.png
+  - assets/icons/github.png
   - assets/icons/linkedin.png
   - assets/icons/logo.png
   - assets/icons/profile.png

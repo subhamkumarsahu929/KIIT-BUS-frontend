@@ -86,25 +86,24 @@ class InfoPage extends StatelessWidget {
                         child: Column(
                           children: [
                             SocialBox(
-                              iconPath: 'assets/icons/linkedin.png',
-                              label: 'LinkedIn',
-                              url:
-                                  'https://www.linkedin.com/in/subham-kumar-sahu-ba3446279?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
-                              backgroundColor: darkGrey,
-                            ),
-                            Container(height: 1, color: darkBlue),
-                            SocialBox(
-                              iconPath: 'assets/icons/instagram.png',
-                              label: 'Instagram',
-                              url:
-                                  'https://www.instagram.com/kumarsubham_06?igsh=ZXNmOTRmdGNrNnVn',
-                              backgroundColor: darkGrey,
-                            ),
-                            Container(height: 1, color: darkBlue),
-                            SocialBox(
                               iconPath: 'assets/icons/gmail.png',
                               label: 'Gmail',
                               url: 'mailto:subhamkumarsahu929@gmail.com',
+                              backgroundColor: darkGrey,
+                            ),
+                            Container(height: 1, color: darkBlue),
+                            SocialBox(
+                              iconPath: 'assets/icons/linkedin.png',
+                              label: 'LinkedIn',
+                              url:
+                                  'https://www.linkedin.com/in/subham-kumar-sahu-ba3446279/',
+                              backgroundColor: darkGrey,
+                            ),
+                            Container(height: 1, color: darkBlue),
+                            SocialBox(
+                              iconPath: 'assets/icons/github.png',
+                              label: 'Github',
+                              url: 'https://github.com/subhamkumarsahu929',
                               backgroundColor: darkGrey,
                             ),
                           ],
@@ -117,7 +116,6 @@ class InfoPage extends StatelessWidget {
             ),
           ),
 
-       
           Padding(
             padding: const EdgeInsets.only(bottom: 15),
             child: Column(
