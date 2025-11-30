@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -114,9 +115,13 @@ class _DriverDashboardState extends State<DriverDashboard> {
               key: _formKey,
               child: TextFormField(
                 controller: _busNumberController,
-                textCapitalization: TextCapitalization.characters,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(3),
+                ],
                 decoration: InputDecoration(
-                  hintText: 'Enter Bus Number (e.g. BUS-12)',
+                  hintText: 'Enter Bus Number (digits only, up to 3)',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -125,8 +130,19 @@ class _DriverDashboardState extends State<DriverDashboard> {
                     color: theme.colorScheme.secondary,
                   ),
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter bus number" : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter bus number';
+                  }
+
+                  final trimmed = value.trim();
+                  final reg = RegExp(r'^\d{1,3}$');
+                  if (!reg.hasMatch(trimmed)) {
+                    return 'give number only';
+                  }
+
+                  return null;
+                },
               ),
             ),
             const SizedBox(height: 25),

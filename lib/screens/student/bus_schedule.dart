@@ -51,25 +51,9 @@ class BusSchedulePage extends StatelessWidget {
   }
 
   static final List<Map<String, String>> _busSchedules = [
-    {
-      'busNumber': 'BUS-01',
-      'route': 'Campus 1 → Campus 7',
-      'time': '07:00 AM',
-    },
-    {
-      'busNumber': 'BUS-02',
-      'route': 'Campus 7 → Campus 1',
-      'time': '08:00 AM',
-    },
-    {
-      'busNumber': 'BUS-03',
-      'route': 'Campus 1 → Campus 15',
-      'time': '09:00 AM',
-    },
-    {
-      'busNumber': 'BUS-04',
-      'route': 'Campus 15 → Campus 1',
-      'time': '10:00 AM',
-    },
+    {'busNumber': '01', 'route': 'Campus 1 → Campus 7', 'time': '07:00 AM'},
+    {'busNumber': '02', 'route': 'Campus 7 → Campus 1', 'time': '08:00 AM'},
+    {'busNumber': '03', 'route': 'Campus 1 → Campus 15', 'time': '09:00 AM'},
+    {'busNumber': '04', 'route': 'Campus 15 → Campus 1', 'time': '10:00 AM'},
   ];
 }

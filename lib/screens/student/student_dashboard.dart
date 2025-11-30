@@ -6,7 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../widgets/title_bar.dart';
 import '../../maps/location.dart';
-import '../../maps/directions.dart'; // ✅ your DirectionsService class
+import '../../maps/directions.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -30,10 +30,8 @@ class _StudentDashboardState extends State<StudentDashboard>
   final dbRef = FirebaseDatabase.instance.ref("buses");
   final DirectionsService _directionsService = DirectionsService();
 
-  /// 🚌 Custom bus icon
   BitmapDescriptor? _busIcon;
 
-  /// Polyline + distance data
   List<LatLng> polylineCoordinates = [];
   double? distanceKm;
 
@@ -45,11 +43,10 @@ class _StudentDashboardState extends State<StudentDashboard>
     _getStudentLocation();
   }
 
- 
   Future<void> _loadCustomMarker() async {
     _busIcon = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(54, 54)),
-      'assets/icons/bus.png', // ✅ Make sure this file exists
+      'assets/icons/bus.png',
     );
     setState(() {});
   }
@@ -62,7 +59,6 @@ class _StudentDashboardState extends State<StudentDashboard>
       _mapController = null;
     }
   }
-
 
   Future<void> _getStudentLocation() async {
     try {
@@ -161,7 +157,6 @@ class _StudentDashboardState extends State<StudentDashboard>
         );
   }
 
- 
   Future<void> _updateRouteAndDistance() async {
     if (studentLocation == null || busLocation == null) return;
 
@@ -201,7 +196,6 @@ class _StudentDashboardState extends State<StudentDashboard>
     }
   }
 
- 
   double _calculateDistance(LatLng start, LatLng end) {
     const double R = 6371;
     final dLat = (end.latitude - start.latitude) * (pi / 180);
@@ -249,18 +243,16 @@ class _StudentDashboardState extends State<StudentDashboard>
             ),
             const SizedBox(height: 25),
 
-           
             TextField(
               controller: _busNumberController,
               textCapitalization: TextCapitalization.characters,
               decoration: const InputDecoration(
-                hintText: 'Enter Bus Number (e.g. BUS-12)',
+                hintText: 'Enter Bus Number (e.g. number only)',
                 prefixIcon: Icon(Icons.directions_bus),
               ),
             ),
             const SizedBox(height: 20),
 
-         
             Center(
               child: SizedBox(
                 width: double.infinity,
@@ -290,7 +282,6 @@ class _StudentDashboardState extends State<StudentDashboard>
             ),
             const SizedBox(height: 15),
 
-          
             if (distanceKm != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -304,7 +295,6 @@ class _StudentDashboardState extends State<StudentDashboard>
                 ),
               ),
 
-           
             Expanded(
               child: (busLocation == null && studentLocation == null)
                   ? const Center(
