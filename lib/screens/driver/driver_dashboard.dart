@@ -6,6 +6,7 @@ import 'package:location/location.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../widgets/title_bar.dart';
 import '../../theme.dart';
+import '../../api_services/notification_service.dart';
 
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
@@ -57,9 +58,8 @@ class _DriverDashboardState extends State<DriverDashboard> {
       if (_disposed ||
           !mounted ||
           newLoc.latitude == null ||
-          newLoc.longitude == null) {
+          newLoc.longitude == null)
         return;
-      }
 
       setState(() => currentLocation = newLoc);
 
@@ -98,7 +98,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
       appBar: const TitleBar(title: 'Driver Dashboard'),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,11 +106,11 @@ class _DriverDashboardState extends State<DriverDashboard> {
               'Driver Control Panel',
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: theme.textTheme.bodyLarge?.color,
               ),
             ),
             const SizedBox(height: 20),
 
+    
             Form(
               key: _formKey,
               child: TextFormField(
@@ -121,42 +121,68 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   LengthLimitingTextInputFormatter(3),
                 ],
                 decoration: InputDecoration(
-                  hintText: 'Enter Bus Number (digits only, up to 3)',
+                  hintText: 'Enter Bus Number (digits only)',
+                  prefixIcon: const Icon(Icons.directions_bus),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                  ),
-                  prefixIcon: Icon(
-                    Icons.directions_bus,
-                    color: theme.colorScheme.secondary,
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Enter bus number';
                   }
-
-                  final trimmed = value.trim();
-                  final reg = RegExp(r'^\d{1,3}$');
-                  if (!reg.hasMatch(trimmed)) {
-                    return 'give number only';
+                  if (!RegExp(r'^\d{1,3}$').hasMatch(value)) {
+                    return 'Give number only';
                   }
-
                   return null;
                 },
               ),
             ),
-            const SizedBox(height: 25),
 
-            Center(
+            const SizedBox(height: 20),
+
+      
+            Expanded(
+              child: currentLocation == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: GoogleMap(
+                        onMapCreated: (controller) =>
+                            _mapController = controller,
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                            currentLocation!.latitude!,
+                            currentLocation!.longitude!,
+                          ),
+                          zoom: 16,
+                        ),
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId('driver'),
+                            position: LatLng(
+                              currentLocation!.latitude!,
+                              currentLocation!.longitude!,
+                            ),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueGreen,
+                            ),
+                          ),
+                        },
+                      ),
+                    ),
+            ),
+
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isSharing
                       ? Colors.red
                       : AppTheme.primaryColor,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 15,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -182,51 +208,20 @@ class _DriverDashboardState extends State<DriverDashboard> {
 
                     if (isSharing) {
                       _startLocationUpdates(busNumber);
+                      NotificationService.showNotification(
+                        title: " Location Sharing Started",
+                        body: "Your bus location is now live",
+                      );
                     } else {
                       _stopLocationUpdates(busNumber);
+                      NotificationService.showNotification(
+                        title: " Location Sharing Stopped",
+                        body: "Your bus location is no longer shared",
+                      );
                     }
                   }
                 },
               ),
-            ),
-            const SizedBox(height: 30),
-
-            Expanded(
-              child: currentLocation == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: GoogleMap(
-                        onMapCreated: (controller) =>
-                            _mapController = controller,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                            currentLocation!.latitude!,
-                            currentLocation!.longitude!,
-                          ),
-                          zoom: 16,
-                        ),
-                        markers: {
-                          if (currentLocation != null)
-                            Marker(
-                              markerId: const MarkerId('driver'),
-                              position: LatLng(
-                                currentLocation!.latitude!,
-                                currentLocation!.longitude!,
-                              ),
-                              infoWindow: InfoWindow(
-                                title: 'Current Location',
-                                snippet:
-                                    'Lat: ${currentLocation!.latitude?.toStringAsFixed(4)}, '
-                                    'Lng: ${currentLocation!.longitude?.toStringAsFixed(4)}',
-                              ),
-                              icon: BitmapDescriptor.defaultMarkerWithHue(
-                                BitmapDescriptor.hueGreen,
-                              ),
-                            ),
-                        },
-                      ),
-                    ),
             ),
           ],
         ),
