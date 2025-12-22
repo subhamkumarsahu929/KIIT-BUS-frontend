@@ -4,15 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'theme.dart';
 import 'screens/splash/splash_screen.dart';
-import 'api_services/notification_service.dart'; 
+import 'api_services/notification_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  var ensureInitialized = WidgetsFlutterBinding.ensureInitialized();
 
-  
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService().initNotifications();
 
   final prefs = await SharedPreferences.getInstance();
@@ -20,6 +17,7 @@ Future<void> main() async {
 
   runApp(KiitBusApp(userType: userType));
 }
+
 class KiitBusApp extends StatelessWidget {
   final String? userType;
 

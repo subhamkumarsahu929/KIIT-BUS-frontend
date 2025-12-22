@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'driver_dashboard.dart';
 import '../../widgets/title_bar.dart';
 import '../../theme.dart';
+import '../../widgets/slide_up_route.dart';
 
 class DriverMainPage extends StatefulWidget {
   const DriverMainPage({super.key});
@@ -55,7 +56,6 @@ class _DriverMainPageState extends State<DriverMainPage> {
             isLoading = false;
           });
 
-        
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('username', username);
           await prefs.setString('email', email);
@@ -65,7 +65,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
         }
       } else {
         debugPrint("No data found for driver ${user.uid}");
-        
+
         setState(() {
           username = user.displayName ?? "Unknown Driver";
           email = user.email ?? "";
@@ -97,7 +97,6 @@ class _DriverMainPageState extends State<DriverMainPage> {
             children: [
               const SizedBox(height: 10),
 
-             
               Text(
                 'Welcome to Driver Portal',
                 textAlign: TextAlign.center,
@@ -110,7 +109,6 @@ class _DriverMainPageState extends State<DriverMainPage> {
 
               const SizedBox(height: 25),
 
-             
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : Container(
@@ -171,7 +169,6 @@ class _DriverMainPageState extends State<DriverMainPage> {
         ),
       ),
 
-     
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         decoration: BoxDecoration(
@@ -207,10 +204,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
             ),
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const DriverDashboard()),
-            );
+            Navigator.push(context, SlideUpRoute(page: DriverDashboard()));
           },
         ),
       ),

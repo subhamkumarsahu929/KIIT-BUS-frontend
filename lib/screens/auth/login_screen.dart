@@ -45,12 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final snapshot = await _dbRef.child("users").child(uid).get();
 
       if (!snapshot.exists) {
-        final isMounted = context.mounted;
-        if (isMounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User not found in database')),
-          );
-        }
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not found in database')),
+        );
         return;
       }
 
@@ -87,10 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Login successful!')));
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.message ?? 'Login failed')));
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));

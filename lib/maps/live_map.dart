@@ -22,17 +22,18 @@ class _LiveMapState extends State<LiveMap> {
   DatabaseReference? _busRef;
   String _address = "Fetching address...";
   Set<Polyline> _polylines = {};
-  BitmapDescriptor? _busIcon; 
+  BitmapDescriptor? _busIcon;
   final DirectionsService _directionsService = DirectionsService();
 
   @override
   void initState() {
     super.initState();
-    _loadCustomMarker(); // 
+    _loadCustomMarker(); //
     _initializeLocations();
   }
 
   Future<void> _loadCustomMarker() async {
+  
     _busIcon = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(54, 54)),
       'assets/icons/bus.png',
@@ -99,7 +100,6 @@ class _LiveMapState extends State<LiveMap> {
     }
 
     if (_busLocation == _studentLocation) {
-     
       return;
     }
 
@@ -111,7 +111,6 @@ class _LiveMapState extends State<LiveMap> {
         _busLocation!,
       );
 
-     
       setState(() {
         _polylines = {
           Polyline(

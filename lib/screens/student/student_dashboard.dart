@@ -8,6 +8,7 @@ import '../../widgets/title_bar.dart';
 import '../../maps/location.dart';
 import '../../maps/directions.dart';
 import '../../api_services/notification_service.dart';
+import 'dart:ui';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -223,56 +224,60 @@ class _StudentDashboardState extends State<StudentDashboard>
 
             const SizedBox(height: 12),
 
-            if (busLocation != null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: busStatusCard(
-                  busNumber: _busNumberController.text.toUpperCase(),
-                  status: busStatus,
-                  distance: distanceKm,
-                  etaMinutes: etaMinutes,
-                  lastUpdated: lastUpdated,
-                ),
-              ),
-
-            const SizedBox(height: 12),
-
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: GoogleMap(
-                  onMapCreated: (controller) => _mapController = controller,
-                  initialCameraPosition: CameraPosition(
-                    target: studentLocation ?? const LatLng(0, 0),
-                    zoom: 14,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: GoogleMap(
+                      onMapCreated: (controller) => _mapController = controller,
+                      initialCameraPosition: CameraPosition(
+                        target: studentLocation ?? const LatLng(0, 0),
+                        zoom: 14,
+                      ),
+                      markers: {
+                        if (busLocation != null)
+                          Marker(
+                            markerId: const MarkerId("bus"),
+                            position: busLocation!,
+                            icon: _busIcon ?? BitmapDescriptor.defaultMarker,
+                          ),
+                        if (studentLocation != null)
+                          Marker(
+                            markerId: const MarkerId("student"),
+                            position: studentLocation!,
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueRed,
+                            ),
+                          ),
+                      },
+                      polylines: {
+                        if (polylineCoordinates.isNotEmpty)
+                          Polyline(
+                            polylineId: const PolylineId("route"),
+                            points: polylineCoordinates,
+                            color: Colors.blue,
+                            width: 5,
+                          ),
+                      },
+                      myLocationEnabled: true,
+                    ),
                   ),
-                  markers: {
-                    if (busLocation != null)
-                      Marker(
-                        markerId: const MarkerId("bus"),
-                        position: busLocation!,
-                        icon: _busIcon ?? BitmapDescriptor.defaultMarker,
+
+                  if (busLocation != null)
+                    Positioned(
+                      top: 16,
+                      left: 12,
+                      right: 16,
+                      child: busStatusCard(
+                        busNumber: _busNumberController.text.toUpperCase(),
+                        status: busStatus,
+                        distance: distanceKm,
+                        etaMinutes: etaMinutes,
+                        lastUpdated: lastUpdated,
                       ),
-                    if (studentLocation != null)
-                      Marker(
-                        markerId: const MarkerId("student"),
-                        position: studentLocation!,
-                        icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueRed,
-                        ),
-                      ),
-                  },
-                  polylines: {
-                    if (polylineCoordinates.isNotEmpty)
-                      Polyline(
-                        polylineId: const PolylineId("route"),
-                        points: polylineCoordinates,
-                        color: Colors.blue,
-                        width: 5,
-                      ),
-                  },
-                  myLocationEnabled: true,
-                ),
+                    ),
+                ],
               ),
             ),
 
@@ -295,84 +300,104 @@ class _StudentDashboardState extends State<StudentDashboard>
       ),
     );
   }
-}
 
-Widget busStatusCard({
-  required String busNumber,
-  required String status,
-  required double? distance,
-  required int? etaMinutes,
-  required DateTime? lastUpdated,
-}) {
-  Color statusColor = status == "Reached"
-      ? Colors.green
-      : status == "Near You"
-      ? Colors.orange
-      : Colors.blue;
+  Widget busStatusCard({
+    required String busNumber,
+    required String status,
+    required double? distance,
+    required int? etaMinutes,
+    required DateTime? lastUpdated,
+  }) {
+    Color statusColor = status == "Reached"
+        ? Colors.green
+        : status == "Near You"
+        ? Colors.orange
+        : Colors.blue;
 
-  return Card(
-    elevation: 0,
-    shape: RoundedRectangleBorder(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      side: BorderSide(color: Colors.grey.shade300),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            busNumber,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 6),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.35),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white24),
           ),
-
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Status: $status",
-                    style: TextStyle(
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  busNumber,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 4),
-                  if (distance != null)
-                    Text(
-                      "Distance: ${distance.toStringAsFixed(2)} km",
-                      style: const TextStyle(fontSize: 13),
+                ),
+
+                const SizedBox(height: 8),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Status: $status",
+                          style: TextStyle(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        if (distance != null)
+                          Text(
+                            "Distance: ${distance.toStringAsFixed(2)} km",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.white70,
+                            ),
+                          ),
+                      ],
                     ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (etaMinutes != null)
-                    Text(
-                      "ETA: $etaMinutes min",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
+
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (etaMinutes != null)
+                          Text(
+                            "ETA: $etaMinutes min",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        const SizedBox(height: 4),
+                        if (lastUpdated != null)
+                          Text(
+                            "Updated: ${lastUpdated.hour}:${lastUpdated.minute.toString().padLeft(2, '0')}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.white60,
+                            ),
+                          ),
+                      ],
                     ),
-                  const SizedBox(height: 4),
-                  if (lastUpdated != null)
-                    Text(
-                      "Updated: ${lastUpdated.hour}:${lastUpdated.minute.toString().padLeft(2, '0')}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

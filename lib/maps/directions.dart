@@ -26,7 +26,7 @@ class DirectionsService {
 
       final routes = data['routes'] as List<dynamic>;
       if (routes.isEmpty) {
-        // No routes found for these coordinates
+        
 
         return [];
       }
@@ -42,7 +42,7 @@ class DirectionsService {
     }
   }
 
-  /// Decode the polyline from encoded Google response
+
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> polyline = [];
     int index = 0, len = encoded.length;

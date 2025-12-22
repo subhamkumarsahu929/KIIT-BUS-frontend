@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -30,9 +31,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (email.isEmpty || password.isEmpty || username.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
@@ -81,9 +82,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -95,19 +96,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final double padding = size.width * 0.08;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Register'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: padding, vertical: 30),
             child: Column(
               children: [
-                Icon(Icons.person_add_alt_1,
-                    size: size.height * 0.12,
-                    color: Theme.of(context).primaryColor),
+                Icon(
+                  Icons.person_add_alt_1,
+                  size: size.height * 0.12,
+                  color: Theme.of(context).primaryColor,
+                ),
                 const SizedBox(height: 25),
 
                 Text(
@@ -158,7 +158,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -187,7 +186,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton.icon(
-                          icon: const Icon(Icons.person_add, color: Colors.white),
+                          icon: const Icon(
+                            Icons.person_add,
+                            color: Colors.white,
+                          ),
                           label: const Text('Register'),
                           onPressed: _register,
                         ),

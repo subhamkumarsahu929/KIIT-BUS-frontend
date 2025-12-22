@@ -58,8 +58,9 @@ class _DriverDashboardState extends State<DriverDashboard> {
       if (_disposed ||
           !mounted ||
           newLoc.latitude == null ||
-          newLoc.longitude == null)
+          newLoc.longitude == null) {
         return;
+      }
 
       setState(() => currentLocation = newLoc);
 
@@ -110,7 +111,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
             const SizedBox(height: 20),
 
-    
             Form(
               key: _formKey,
               child: TextFormField(
@@ -141,7 +141,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
 
             const SizedBox(height: 20),
 
-      
             Expanded(
               child: currentLocation == null
                   ? const Center(child: CircularProgressIndicator())

@@ -6,6 +6,7 @@ import 'student_dashboard.dart';
 import 'bus_schedule.dart';
 import '../../widgets/title_bar.dart';
 import '../../theme.dart';
+import '../../widgets/slide_up_route.dart';
 
 class StudentMainPage extends StatefulWidget {
   const StudentMainPage({super.key});
@@ -23,10 +24,9 @@ class _StudentMainPageState extends State<StudentMainPage> {
   void initState() {
     super.initState();
     _loadLocalUserData();
-    _fetchUserDataFromFirebase(); 
+    _fetchUserDataFromFirebase();
   }
 
- 
   Future<void> _loadLocalUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -36,7 +36,6 @@ class _StudentMainPageState extends State<StudentMainPage> {
     });
   }
 
- 
   Future<void> _fetchUserDataFromFirebase() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -60,7 +59,6 @@ class _StudentMainPageState extends State<StudentMainPage> {
             isLoading = false;
           });
 
-         
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('username', username);
           await prefs.setString('email', email);
@@ -70,7 +68,7 @@ class _StudentMainPageState extends State<StudentMainPage> {
         }
       } else {
         debugPrint("No data found for user ${user.uid}");
-        
+
         setState(() {
           username = user.displayName ?? "Unknown Student";
           email = user.email ?? "No email";
@@ -98,7 +96,6 @@ class _StudentMainPageState extends State<StudentMainPage> {
             children: [
               const SizedBox(height: 10),
 
-            
               Text(
                 'Welcome to Student Portal',
                 textAlign: TextAlign.center,
@@ -156,7 +153,7 @@ class _StudentMainPageState extends State<StudentMainPage> {
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontSize: 14,
                                     color: theme.textTheme.bodyMedium?.color
-                                        ?.withValues(alpha:0.7),
+                                        ?.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -172,7 +169,6 @@ class _StudentMainPageState extends State<StudentMainPage> {
         ),
       ),
 
-     
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         decoration: BoxDecoration(
@@ -210,7 +206,9 @@ class _StudentMainPageState extends State<StudentMainPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const StudentDashboard()),
+                    SlideUpRoute(
+                      page: StudentDashboard(), 
+                    ),
                   );
                 },
               ),
@@ -233,7 +231,9 @@ class _StudentMainPageState extends State<StudentMainPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const BusSchedulePage()),
+                    SlideUpRoute(
+                      page: BusSchedulePage(), 
+                    ),
                   );
                 },
               ),
