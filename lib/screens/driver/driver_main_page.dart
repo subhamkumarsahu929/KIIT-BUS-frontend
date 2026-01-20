@@ -86,10 +86,11 @@ class _DriverMainPageState extends State<DriverMainPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF0F111A) : const Color(0xFFF0F2F5);
 
     return Scaffold(
       appBar: const TitleBar(title: 'KIIT BUS'),
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -112,32 +113,58 @@ class _DriverMainPageState extends State<DriverMainPage> {
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
                       decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(15),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            isDark 
+                                ? Colors.white.withOpacity(0.08) 
+                                : Colors.white.withOpacity(0.9),
+                            isDark 
+                                ? Colors.white.withOpacity(0.03) 
+                                : Colors.white.withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: AppTheme.primaryColor.withOpacity(isDark ? 0.3 : 0.5),
+                          width: 1.5,
+                        ),
                         boxShadow: [
-                          if (!isDark)
-                            const BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                            ),
+                          BoxShadow(
+                            color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
                         ],
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          CircleAvatar(
-                            radius: 35,
-                            backgroundColor: AppTheme.primaryColor,
-                            child: const Icon(
-                              Icons.directions_bus,
-                              size: 40,
-                              color: Colors.white,
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppTheme.primaryColor.withOpacity(0.5),
+                                width: 2,
+                              ),
                             ),
+                            child: CircleAvatar(
+                              radius: 28,
+                              backgroundColor: AppTheme.primaryColor.withOpacity(0.2),
+                              child: const Icon(
+                                Icons.directions_bus,
+                                size: 30,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
+
                           ),
-                          const SizedBox(width: 15),
+                          const SizedBox(width: 18),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,15 +174,27 @@ class _DriverMainPageState extends State<DriverMainPage> {
                                   style: theme.textTheme.bodyLarge?.copyWith(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
                                   ),
+
                                 ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  email,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontSize: 14,
-                                    color: theme.textTheme.bodyMedium?.color
-                                        ?.withValues(alpha: 0.7),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    email,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -164,49 +203,88 @@ class _DriverMainPageState extends State<DriverMainPage> {
                         ],
                       ),
                     ),
+
             ],
           ),
         ),
       ),
 
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
-          color: theme.cardColor,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1E1E1E), // Premium Charcoal Black
+              Color(0xFF2D2D2D), // Deep Slate
+            ],
+
+          ),
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(35),
+            topRight: Radius.circular(35),
           ),
           boxShadow: [
-            if (!isDark)
-              const BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, -2),
-              ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 15,
+              offset: const Offset(0, -4),
+            ),
           ],
         ),
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryColor,
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          icon: const Icon(Icons.dashboard, color: Colors.white),
-          label: const Text(
-            'Go to Dashboard',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        child: _buildNavButton(
+          context: context,
+          icon: Icons.dashboard_rounded,
+          label: 'Go to Dashboard',
+          color: AppTheme.primaryColor,
           onPressed: () {
-            Navigator.push(context, SlideUpRoute(page: DriverDashboard()));
+            Navigator.push(context, SlideUpRoute(page: const DriverDashboard()));
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: Icon(icon, size: 24),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        onPressed: onPressed,
       ),
     );
   }

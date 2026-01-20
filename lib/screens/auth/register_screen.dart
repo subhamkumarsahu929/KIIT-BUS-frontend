@@ -1,10 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../student/student_main_page.dart';
 import '../driver/driver_main_page.dart';
+import '../../widgets/title_bar.dart';
+import '../../theme.dart';
+import 'dart:ui';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,6 +36,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      return;
+    }
+
+    if (_userType == 'student' &&
+        !email.toLowerCase().endsWith('@kiit.ac.in')) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Student email must end with @kiit.ac.in'),
+        ),
+      );
+      return;
+    }
+
+    if (_userType == 'driver' && !email.toLowerCase().endsWith('@gmail.com')) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Driver email must end with @gmail.com')),
+      );
       return;
     }
 
@@ -92,108 +113,174 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? const Color(0xFF0F111A)
+        : const Color(0xFFF0F2F5);
     final size = MediaQuery.of(context).size;
-    final double padding = size.width * 0.08;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Register'), centerTitle: true),
+      appBar: const TitleBar(title: 'Register', showSettings: false),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: padding, vertical: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
             child: Column(
               children: [
                 Icon(
                   Icons.person_add_alt_1,
-                  size: size.height * 0.12,
-                  color: Theme.of(context).primaryColor,
+                  size: size.height * 0.1,
+                  color: AppTheme.primaryColor,
                 ),
                 const SizedBox(height: 25),
-
                 Text(
-                  'Create Your KIIT BUS Account',
-                  style: TextStyle(
-                    fontSize: size.width * 0.055,
+                  'Join KIIT BUS',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                    letterSpacing: 0.5,
                   ),
-                ),
-                const SizedBox(height: 40),
-
-                TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    prefixIcon: const Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Radio<String>(
-                      value: 'student',
-                      groupValue: _userType,
-                      onChanged: (value) =>
-                          setState(() => _userType = value ?? 'student'),
-                    ),
-                    const Text('Student'),
-                    const SizedBox(width: 20),
-                    Radio<String>(
-                      value: 'driver',
-                      groupValue: _userType,
-                      onChanged: (value) =>
-                          setState(() => _userType = value ?? 'driver'),
-                    ),
-                    const Text('Driver'),
-                  ],
                 ),
                 const SizedBox(height: 30),
-
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.person_add,
-                            color: Colors.white,
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        isDark
+                            ? Colors.white.withOpacity(0.08)
+                            : Colors.white.withOpacity(0.9),
+                        isDark
+                            ? Colors.white.withOpacity(0.03)
+                            : Colors.white.withOpacity(0.7),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withOpacity(
+                        isDark ? 0.3 : 0.5,
+                      ),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          prefixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          label: const Text('Register'),
-                          onPressed: _register,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: AppTheme.primaryColor,
+                              width: 2,
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: const Icon(Icons.email),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: AppTheme.primaryColor,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: AppTheme.primaryColor,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Radio<String>(
+                            value: 'student',
+                            activeColor: AppTheme.primaryColor,
+                            groupValue: _userType,
+                            onChanged: (value) =>
+                                setState(() => _userType = value ?? 'student'),
+                          ),
+                          const Text('Student'),
+                          const SizedBox(width: 15),
+                          Radio<String>(
+                            value: 'driver',
+                            activeColor: AppTheme.primaryColor,
+                            groupValue: _userType,
+                            onChanged: (value) =>
+                                setState(() => _userType = value ?? 'driver'),
+                          ),
+                          const Text('Driver'),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : SizedBox(
+                              width: double.infinity,
+                              height: 55,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.person_add,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  'Create Account',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: _register,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => Navigator.pop(context),

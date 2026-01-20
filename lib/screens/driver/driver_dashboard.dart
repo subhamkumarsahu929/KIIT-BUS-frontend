@@ -124,7 +124,18 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   hintText: 'Enter Bus Number (digits only)',
                   prefixIcon: const Icon(Icons.directions_bus),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: const BorderSide(
+                      color: AppTheme.primaryColor,
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) {
@@ -183,7 +194,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                       : AppTheme.primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                 ),
                 icon: Icon(

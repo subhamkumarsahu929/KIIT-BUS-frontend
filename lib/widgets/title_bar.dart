@@ -5,8 +5,13 @@ import '../screens/info/info_page.dart';
 
 class TitleBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
+  final bool showSettings;
 
-  const TitleBar({super.key, required this.title});
+  const TitleBar({
+    super.key,
+    required this.title,
+    this.showSettings = true,
+  });
 
   @override
   State<TitleBar> createState() => _TitleBarState();
@@ -148,23 +153,36 @@ class _TitleBarState extends State<TitleBar>
     return AppBar(
       toolbarHeight: dynamicHeight,
       centerTitle: true,
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.3),
       backgroundColor: theme.primaryColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        ),
+      ),
       title: Text(
         widget.title,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.white,
+          fontSize: 22,
+          letterSpacing: 1.1,
         ),
       ),
-      actions: [
-        RotationTransition(
-          turns: Tween(begin: 0.0, end: 0.25).animate(_iconController),
-          child: IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () => _openSettings(context),
-          ),
-        ),
-      ],
+
+
+      actions: widget.showSettings
+          ? [
+              RotationTransition(
+                turns: Tween(begin: 0.0, end: 0.25).animate(_iconController),
+                child: IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.white),
+                  onPressed: () => _openSettings(context),
+                ),
+              ),
+            ]
+          : null,
     );
   }
 }

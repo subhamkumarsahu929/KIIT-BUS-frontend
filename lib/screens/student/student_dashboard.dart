@@ -8,6 +8,7 @@ import '../../widgets/title_bar.dart';
 import '../../maps/location.dart';
 import '../../maps/directions.dart';
 import '../../api_services/notification_service.dart';
+import '../../theme.dart';
 import 'dart:ui';
 
 class StudentDashboard extends StatefulWidget {
@@ -216,9 +217,23 @@ class _StudentDashboardState extends State<StudentDashboard>
             TextField(
               controller: _busNumberController,
               textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.directions_bus),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.directions_bus),
                 hintText: "Enter Bus Number",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(
+                    color: AppTheme.primaryColor,
+                    width: 2,
+                  ),
+                ),
               ),
             ),
 
@@ -286,6 +301,12 @@ class _StudentDashboardState extends State<StudentDashboard>
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
                 onPressed: () {
                   if (_busNumberController.text.isNotEmpty) {
                     _trackBus(_busNumberController.text.trim());
