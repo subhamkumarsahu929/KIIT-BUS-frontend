@@ -91,9 +91,8 @@ class _SplashScreenState extends State<SplashScreen>
             colors: [
               const Color(0xFF1E1E2C), // Deep Midnight
               const Color(0xFF0F0F1A), // Near Black
-              AppTheme.primaryColor.withOpacity(
-                0.05,
-              ), // Subtle Green Hint at bottom
+              AppTheme.primaryColor.withValues(alpha: 0.05),
+              // Subtle Green Hint at bottom
             ],
           ),
         ),
@@ -112,7 +111,8 @@ class _SplashScreenState extends State<SplashScreen>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryColor.withOpacity(0.08),
+                           // color: AppTheme.primaryColor.withOpacity(0.08),
+                            color: AppTheme.primaryColor.withValues(alpha: 0.08),
                             blurRadius: 50,
                             spreadRadius: 15,
                           ),

@@ -80,6 +80,7 @@ flutter:
   - assets/icons/linkedin.png
   - assets/icons/logo.png
   - assets/icons/profile.png
+  - secrets.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

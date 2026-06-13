@@ -121,21 +121,22 @@ class _DriverMainPageState extends State<DriverMainPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             isDark 
-                                ? Colors.white.withOpacity(0.08) 
-                                : Colors.white.withOpacity(0.9),
+                                ? Colors.white.withValues(alpha: 0.08) 
+                                : Colors.white.withValues(alpha: 0.9),
                             isDark 
-                                ? Colors.white.withOpacity(0.03) 
-                                : Colors.white.withOpacity(0.7),
+                                ? Colors.white.withValues(alpha: 0.03) 
+                                : Colors.white.withValues(alpha: 0.7),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: AppTheme.primaryColor.withOpacity(isDark ? 0.3 : 0.5),
+                          color: AppTheme.primaryColor.withValues(alpha: isDark ? 0.3 : 0.5),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                            //color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),
@@ -149,7 +150,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppTheme.primaryColor.withOpacity(0.5),
+                                color: AppTheme.primaryColor.withValues(alpha: 0.2),
                                 width: 2,
                               ),
                             ),
@@ -185,7 +186,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primaryColor.withOpacity(0.1),
+                                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -259,7 +260,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

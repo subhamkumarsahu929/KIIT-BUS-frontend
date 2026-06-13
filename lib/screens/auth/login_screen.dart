@@ -7,7 +7,6 @@ import '../driver/driver_main_page.dart';
 import 'register_screen.dart';
 import '../../widgets/title_bar.dart';
 import '../../theme.dart';
-import 'dart:ui';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -158,23 +157,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       end: Alignment.bottomRight,
                       colors: [
                         isDark
-                            ? Colors.white.withOpacity(0.08)
-                            : Colors.white.withOpacity(0.9),
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.white.withValues(alpha: 0.9),
                         isDark
-                            ? Colors.white.withOpacity(0.03)
-                            : Colors.white.withOpacity(0.7),
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.white.withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: AppTheme.primaryColor.withOpacity(
-                        isDark ? 0.3 : 0.5,
+                      color: AppTheme.primaryColor.withValues(
+                        alpha: isDark ? 0.3 : 0.5,
                       ),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                        color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),

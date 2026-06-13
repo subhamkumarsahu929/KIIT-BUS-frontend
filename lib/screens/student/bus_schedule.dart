@@ -47,9 +47,12 @@ class BusSchedulePage extends StatelessWidget {
                           isDark
                               ? Colors.white.withOpacity(0.08)
                               : Colors.white.withOpacity(0.9),
-                          isDark
-                              ? Colors.white.withOpacity(0.03)
-                              : Colors.white.withOpacity(0.7),
+                                          isDark
+                                            ? Colors.white.withValues(alpha: 0.08)
+                                            : Colors.white.withValues(alpha: 0.9),
+                                          isDark
+                                            ? Colors.white.withValues(alpha: 0.03)
+                                            : Colors.white.withValues(alpha: 0.7),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(24),
@@ -57,6 +60,7 @@ class BusSchedulePage extends StatelessWidget {
                         color: AppTheme.primaryColor.withOpacity(
                           isDark ? 0.3 : 0.5,
                         ),
+                       // color: AppTheme.primaryColor.withValues(alpha: isDark ? 0.3 : 0.5),
                         width: 1.5,
                       ),
                       boxShadow: [
@@ -72,10 +76,12 @@ class BusSchedulePage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.1),
+                            //color: AppTheme.primaryColor.withOpacity(0.1),
+                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppTheme.primaryColor.withOpacity(0.3),
+                              //color: AppTheme.primaryColor.withOpacity(0.3),
+                              color: AppTheme.primaryColor.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -116,7 +122,8 @@ class BusSchedulePage extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.15),
+                            //color: AppTheme.primaryColor.withOpacity(0.15),
+                            color: AppTheme.primaryColor.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

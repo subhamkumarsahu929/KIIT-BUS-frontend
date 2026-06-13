@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/title_bar.dart';
 import '../../theme.dart';
-import 'dart:ui';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
@@ -42,13 +41,13 @@ class InfoPage extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.9),
-                        isDark ? Colors.white.withOpacity(0.03) : Colors.white.withOpacity(0.7),
+                        isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.9),
+                        isDark ? Colors.white.withValues(alpha: 0.03) : Colors.white.withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: AppTheme.primaryColor.withOpacity(isDark ? 0.3 : 0.5),
+                      color: AppTheme.primaryColor.withValues(alpha: isDark ? 0.3 : 0.5),
                       width: 1.5,
                     ),
                   ),
@@ -58,8 +57,8 @@ class InfoPage extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppTheme.primaryColor.withOpacity(0.1),
-                          border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                          border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
                         ),
                         child: Image.asset(
                           'assets/icons/logo.png',
@@ -147,7 +146,7 @@ class InfoPage extends StatelessWidget {
                 Text(
                   'Version 2.0.0',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.primaryColor.withOpacity(0.7),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -194,14 +193,14 @@ class SocialTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
             ),
             boxShadow: isDark ? [] : [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -212,7 +211,8 @@ class SocialTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  //color: AppTheme.primaryColor.withOpacity(0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.asset(iconPath, height: 24, width: 24),
@@ -244,7 +244,8 @@ class SocialTile extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
-                color: AppTheme.primaryColor.withOpacity(0.5),
+               // color: AppTheme.primaryColor.withOpacity(0.5),
+                color: AppTheme.primaryColor.withValues(alpha: 0.5),
               ),
             ],
           ),

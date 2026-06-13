@@ -10,8 +10,11 @@ class ApiService {
     double lat,
     double lng,
   ) async {
+    final String key = Constants.googleApiKey.isNotEmpty
+        ? Constants.googleApiKey
+        : Constants.apiKey;
     final Uri url = Uri.parse(
-      'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=${Constants.googleApiKey}',
+      'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$key',
     );
 
     final response = await http.get(url);

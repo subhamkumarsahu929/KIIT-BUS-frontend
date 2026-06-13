@@ -8,6 +8,7 @@ import '../../widgets/title_bar.dart';
 import '../../theme.dart';
 import '../../api_services/notification_service.dart';
 
+
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
 
@@ -128,7 +129,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25),

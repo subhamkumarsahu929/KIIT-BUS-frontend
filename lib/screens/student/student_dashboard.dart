@@ -9,6 +9,7 @@ import '../../maps/location.dart';
 import '../../maps/directions.dart';
 import '../../api_services/notification_service.dart';
 import '../../theme.dart';
+import '../../util/permission_helper.dart';
 import 'dart:ui';
 
 class StudentDashboard extends StatefulWidget {
@@ -87,7 +88,7 @@ class _StudentDashboardState extends State<StudentDashboard>
     });
   }
 
-  void _trackBus(String busNumber) {
+  Future<void> _trackBus(String busNumber) async {
     _busLocationSubscription?.cancel();
 
     final busNo = busNumber.toUpperCase();
@@ -126,9 +127,27 @@ class _StudentDashboardState extends State<StudentDashboard>
   Future<void> _updateRouteAndDistance() async {
     if (studentLocation == null || busLocation == null) return;
 
-    final points = await _directionsService.getRoutePoints(
-      studentLocation!,
-      busLocation!,
+    // Get the route points from Directions API.
+    List<LatLng> points = [];
+    try {
+      points = await _directionsService.getRoutePoints(
+        studentLocation!,
+        busLocation!,
+      );
+    } catch (e) {
+      debugPrint('Directions API error: $e');
+    }
+
+    // Fallback to a straight line if the API returns nothing.
+    if (points.isEmpty) {
+      points = [studentLocation!, busLocation!];
+    }
+
+    // Simplify the polyline to keep road detail while reducing point count.
+    final List<LatLng> sampled = _simplifyPolyline(
+      points,
+      tolerance: 0.00001,
+      maxPoints: 500,
     );
 
     final dist = _calculateDistance(studentLocation!, busLocation!);
@@ -143,7 +162,7 @@ class _StudentDashboardState extends State<StudentDashboard>
     }
 
     setState(() {
-      polylineCoordinates = points;
+      polylineCoordinates = sampled;
       distanceKm = dist;
       etaMinutes = ((dist / 45) * 60).ceil();
       busStatus = newStatus;
@@ -154,6 +173,83 @@ class _StudentDashboardState extends State<StudentDashboard>
       _sendStatusNotification(newStatus);
       lastNotifiedStatus = newStatus;
     }
+  }
+
+  /// Down‑samples a polyline to a maximum number of points while keeping the shape.
+  /// Guarantees that the first and last points are always kept.
+  List<LatLng> _samplePolylinePoints(
+    List<LatLng> points, {
+    int maxPoints = 300,
+  }) {
+    if (points.length <= maxPoints) return points;
+
+    final int step = (points.length / (maxPoints - 1)).ceil();
+    final List<LatLng> sampled = <LatLng>[points.first];
+
+    for (int index = step; index < points.length - 1; index += step) {
+      sampled.add(points[index]);
+    }
+
+    sampled.add(points.last);
+    return sampled;
+  }
+
+  List<LatLng> _simplifyPolyline(
+    List<LatLng> points, {
+    double tolerance = 0.00005,
+    int maxPoints = 300,
+  }) {
+    if (points.length <= maxPoints) return points;
+
+    final simplified = _ramerDouglasPeucker(points, tolerance);
+    if (simplified.length <= maxPoints) return simplified;
+
+    return _samplePolylinePoints(simplified, maxPoints: maxPoints);
+  }
+
+  List<LatLng> _ramerDouglasPeucker(List<LatLng> points, double tolerance) {
+    if (points.length < 3) return List<LatLng>.from(points);
+
+    int index = -1;
+    double maxDistance = 0;
+
+    for (int i = 1; i < points.length - 1; i++) {
+      final dist = _perpendicularDistance(points[i], points.first, points.last);
+      if (dist > maxDistance) {
+        index = i;
+        maxDistance = dist;
+      }
+    }
+
+    if (maxDistance > tolerance && index >= 0) {
+      final List<LatLng> left = _ramerDouglasPeucker(
+        points.sublist(0, index + 1),
+        tolerance,
+      );
+      final List<LatLng> right = _ramerDouglasPeucker(
+        points.sublist(index, points.length),
+        tolerance,
+      );
+      return [...left.sublist(0, left.length - 1), ...right];
+    }
+
+    return [points.first, points.last];
+  }
+
+  double _perpendicularDistance(LatLng point, LatLng start, LatLng end) {
+    final double dx = end.longitude - start.longitude;
+    final double dy = end.latitude - start.latitude;
+    if (dx == 0 && dy == 0) {
+      return sqrt(
+        pow(point.latitude - start.latitude, 2) +
+            pow(point.longitude - start.longitude, 2),
+      );
+    }
+
+    return (dx * (start.latitude - point.latitude) -
+                (start.longitude - point.longitude) * dy)
+            .abs() /
+        sqrt(dx * dx + dy * dy);
   }
 
   double _calculateDistance(LatLng start, LatLng end) {
@@ -225,6 +321,7 @@ class _StudentDashboardState extends State<StudentDashboard>
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),
+                  // borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
                   borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -271,8 +368,9 @@ class _StudentDashboardState extends State<StudentDashboard>
                           Polyline(
                             polylineId: const PolylineId("route"),
                             points: polylineCoordinates,
-                            color: Colors.blue,
-                            width: 5,
+                            color: Colors.blueAccent,
+                            width: 6,
+                            geodesic: false,
                           ),
                       },
                       myLocationEnabled: true,
@@ -307,9 +405,24 @@ class _StudentDashboardState extends State<StudentDashboard>
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                onPressed: () {
-                  if (_busNumberController.text.isNotEmpty) {
-                    _trackBus(_busNumberController.text.trim());
+                onPressed: () async {
+                  final LocationPermission permission =
+                      await PermissionHelper.requestPermission();
+
+                  if (permission == LocationPermission.always ||
+                      permission == LocationPermission.whileInUse) {
+                    if (_busNumberController.text.isNotEmpty) {
+                      await _trackBus(_busNumberController.text.trim());
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Location permission is required to show live bus locations.',
+                        ),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
                   }
                 },
                 icon: const Icon(Icons.map),
@@ -341,7 +454,8 @@ class _StudentDashboardState extends State<StudentDashboard>
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 6),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.35),
+            //color: Colors.black.withOpacity(0.35),
+            color: Colors.black.withValues(alpha: 0.35),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.white24),
           ),

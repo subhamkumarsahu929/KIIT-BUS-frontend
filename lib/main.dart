@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
+import 'maps/constants.dart';
 import 'theme.dart';
 import 'screens/splash/splash_screen.dart';
 import 'api_services/notification_service.dart';
 
 Future<void> main() async {
-  var ensureInitialized = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Constants.init();
+  debugPrint(
+    'Constants.init() loaded google key=${Constants.googleApiKey.isNotEmpty} directions key=${Constants.directionsKey.isNotEmpty}',
+  );
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService().initNotifications();
