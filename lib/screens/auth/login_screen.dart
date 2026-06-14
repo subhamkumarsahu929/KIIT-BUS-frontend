@@ -34,11 +34,17 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    if (selectedRole == 'student' && !email.toLowerCase().endsWith('@kiit.ac.in')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Student email must end with @kiit.ac.in')),
-      );
-      return;
+    if (selectedRole == 'student') {
+      final localPart = email.split('@').first;
+      final digitCount = localPart.replaceAll(RegExp(r'[^\d]'), '').length;
+      if (!email.toLowerCase().endsWith('@kiit.ac.in') || digitCount > 11) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Student email must have at most 11 digits and end with @kiit.ac.in'),
+          ),
+        );
+        return;
+      }
     }
 
     if (selectedRole == 'driver' && !email.toLowerCase().endsWith('@gmail.com')) {

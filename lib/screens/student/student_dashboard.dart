@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/title_bar.dart';
 import '../../maps/location.dart';
 import '../../maps/directions.dart';
@@ -13,7 +14,8 @@ import '../../util/permission_helper.dart';
 import 'dart:ui';
 
 class StudentDashboard extends StatefulWidget {
-  const StudentDashboard({super.key});
+  final String? initialBusNumber;
+  const StudentDashboard({super.key, this.initialBusNumber});
 
   @override
   State<StudentDashboard> createState() => _StudentDashboardState();
@@ -49,6 +51,21 @@ class _StudentDashboardState extends State<StudentDashboard>
     WidgetsBinding.instance.addObserver(this);
     _loadCustomMarker();
     _getStudentLocation();
+    if (widget.initialBusNumber != null) {
+      _busNumberController.text = widget.initialBusNumber!;
+      _checkAndTrackInitialBus();
+    }
+  }
+
+  Future<void> _checkAndTrackInitialBus() async {
+    final LocationPermission permission =
+        await PermissionHelper.requestPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      if (_busNumberController.text.isNotEmpty) {
+        await _trackBus(_busNumberController.text.trim());
+      }
+    }
   }
 
   Future<void> _loadCustomMarker() async {
@@ -92,6 +109,13 @@ class _StudentDashboardState extends State<StudentDashboard>
     _busLocationSubscription?.cancel();
 
     final busNo = busNumber.toUpperCase();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('tracked_bus_number', busNo);
+    } catch (e) {
+      debugPrint("Error saving tracked bus to prefs: $e");
+    }
 
     _busLocationSubscription = dbRef.child(busNo).onValue.listen((event) {
       if (!mounted || _disposed) return;
@@ -143,14 +167,31 @@ class _StudentDashboardState extends State<StudentDashboard>
       points = [studentLocation!, busLocation!];
     }
 
+    final dist = _calculateDistance(studentLocation!, busLocation!);
+
+    // Scale simplification tolerance and max points based on distance to preserve accuracy
+    double tolerance = 0.00001; // ~1 meter resolution
+    int maxPoints = 1000;
+    if (dist > 30) {
+      tolerance = 0.00008; // ~8 meters
+      maxPoints = 3000;
+    } else if (dist > 15) {
+      tolerance = 0.00005; // ~5 meters
+      maxPoints = 2000;
+    } else if (dist > 5) {
+      tolerance = 0.00003; // ~3 meters
+      maxPoints = 1500;
+    } else if (dist > 2) {
+      tolerance = 0.00002; // ~2 meters
+      maxPoints = 1200;
+    }
+
     // Simplify the polyline to keep road detail while reducing point count.
     final List<LatLng> sampled = _simplifyPolyline(
       points,
-      tolerance: 0.00001,
-      maxPoints: 500,
+      tolerance: tolerance,
+      maxPoints: maxPoints,
     );
-
-    final dist = _calculateDistance(studentLocation!, busLocation!);
 
     String newStatus;
     if (dist < 0.2) {

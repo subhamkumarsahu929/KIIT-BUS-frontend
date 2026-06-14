@@ -135,15 +135,39 @@ class _LiveMapState extends State<LiveMap> {
           "Detailed route returned no points – falling back to straight line.",
         );
         pointsToDraw = [_studentLocation!, _busLocation!];
-      } else if (pointsToDraw.length > 500) {
-        debugPrint(
-          "Large point count (${pointsToDraw.length}) – simplifying route to preserve shape.",
+      } else {
+        final double dist = _calculateDistance(
+          _studentLocation!,
+          _busLocation!,
         );
-        pointsToDraw = _simplifyPolyline(
-          pointsToDraw,
-          tolerance: 0.00001,
-          maxPoints: 500,
-        );
+
+        // Scale simplification tolerance and max points based on distance to preserve accuracy
+        double tolerance = 0.00001; // ~1 meter resolution
+        int maxPoints = 1000;
+        if (dist > 30) {
+          tolerance = 0.00008; // ~8 meters
+          maxPoints = 3000;
+        } else if (dist > 15) {
+          tolerance = 0.00005; // ~5 meters
+          maxPoints = 2000;
+        } else if (dist > 5) {
+          tolerance = 0.00003; // ~3 meters
+          maxPoints = 1500;
+        } else if (dist > 2) {
+          tolerance = 0.00002; // ~2 meters
+          maxPoints = 1200;
+        }
+
+        if (pointsToDraw.length > maxPoints) {
+          debugPrint(
+            "Large point count (${pointsToDraw.length}) at distance ${dist.toStringAsFixed(2)} km – simplifying route with tolerance $tolerance and maxPoints $maxPoints.",
+          );
+          pointsToDraw = _simplifyPolyline(
+            pointsToDraw,
+            tolerance: tolerance,
+            maxPoints: maxPoints,
+          );
+        }
       }
 
       debugPrint('=== ROUTE DEBUG ===');
@@ -277,6 +301,20 @@ class _LiveMapState extends State<LiveMap> {
   }
 
   double _deg2rad(double deg) => deg * (math.pi / 180);
+
+  double _calculateDistance(LatLng start, LatLng end) {
+    const R = 6371;
+    final dLat = (end.latitude - start.latitude) * (math.pi / 180);
+    final dLon = (end.longitude - start.longitude) * (math.pi / 180);
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(start.latitude * (math.pi / 180)) *
+            math.cos(end.latitude * (math.pi / 180)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  }
 
   // Determine if the route is long (default >200 km).
   bool _isLongDistance(LatLng a, LatLng b, {double thresholdMeters = 200000}) {

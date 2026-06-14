@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/info/info_page.dart';
 
@@ -7,11 +9,7 @@ class TitleBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool showSettings;
 
-  const TitleBar({
-    super.key,
-    required this.title,
-    this.showSettings = true,
-  });
+  const TitleBar({super.key, required this.title, this.showSettings = true});
 
   @override
   State<TitleBar> createState() => _TitleBarState();
@@ -117,16 +115,28 @@ class _TitleBarState extends State<TitleBar>
                                 ),
                                 icon: const Icon(Icons.logout),
                                 label: const Text('Logout'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  _iconController.reverse();
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const LoginScreen(),
-                                    ),
-                                    (route) => false,
-                                  );
+                                onPressed: () async {
+                                  // Clear all user data
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.remove('userType');
+                                  await prefs.remove('username');
+                                  await prefs.remove('email');
+
+                                  // Sign out from Firebase
+                                  await FirebaseAuth.instance.signOut();
+
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    _iconController.reverse();
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const LoginScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  }
                                 },
                               ),
                             ),
@@ -157,9 +167,7 @@ class _TitleBarState extends State<TitleBar>
       shadowColor: Colors.black.withOpacity(0.3),
       backgroundColor: theme.primaryColor,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(30),
-        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       title: Text(
         widget.title,
@@ -170,7 +178,6 @@ class _TitleBarState extends State<TitleBar>
           letterSpacing: 1.1,
         ),
       ),
-
 
       actions: widget.showSettings
           ? [

@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "KIIT BUS (Debug)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=secrets.json"
+            ]
+        },
+        {
+            "name": "KIIT BUS (Profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define-from-file=secrets.json"
+            ]
+        },
+        {
+            "name": "KIIT BUS (Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--dart-define-from-file=secrets.json"
+            ]
+        }
+    ]
+}
